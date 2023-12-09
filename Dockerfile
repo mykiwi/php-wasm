@@ -28,7 +28,7 @@ RUN git clone https://gitlab.gnome.org/GNOME/libxml2.git libxml2 \
 WORKDIR /src/libxml2
 RUN ./autogen.sh
 RUN emconfigure ./configure --prefix=/src/libxml2/build --enable-static --disable-shared --with-python=no --with-threads=no
-RUN emmake make -j8
+RUN emmake make -j$((`nproc`+1))
 RUN emmake make install
 
 FROM build_tool AS sqlite
@@ -94,7 +94,7 @@ RUN cd /src/php-src && ./buildconf --force \
 		--enable-pdo       \
 		--with-pdo-sqlite  \
 		--with-sqlite3
-RUN cd /src/php-src && emmake make -j8
+RUN cd /src/php-src && emmake make -j$((`nproc`+1))
 # PHP7 outputs a libphp7 whereas php8 a libphp
 RUN cd /src/php-src && bash -c '[[ -f .libs/libphp7.la ]] && mv .libs/libphp7.la .libs/libphp.la && mv .libs/libphp7.a .libs/libphp.a && mv .libs/libphp7.lai .libs/libphp.lai || exit 0'
 COPY ./source /src/source
